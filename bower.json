@@ -1,0 +1,10 @@
+{
+  "name": "angular-combobox",
+  "description": "ComboBox Directive for Angular",
+  "version": "0.0.1",
+  "dependencies": {
+    "jquery": ">=2.1.0",
+    "lodash": ">=2.4.0",
+    "angular": ">=1.2.0"
+  }
+}

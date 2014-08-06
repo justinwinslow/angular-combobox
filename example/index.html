@@ -1,0 +1,44 @@
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
+<script type="text/javascript" src="http://code.angularjs.org/1.2.9/angular.js"></script>
+<script type="text/javascript" src="../angular-combobox.js"></script>
+
+<script type="text/javascript">
+var myApp = angular.module('myApp', ['ngCombobox']);
+
+myApp.controller('MyCtrl', ['$scope', '$timeout',
+function($scope, $timeout) {
+  $scope.data = [
+    {
+      id: 0,
+      name: 'Number One'
+    },
+    {
+      id: 1,
+      name: 'Number Two'
+    },
+    {
+      id: 2,
+      name: 'Number Three'
+    }
+  ];
+
+  $scope.options = {
+    formatOption: function(option){
+      return {
+        value: option.id,
+        text: option.name
+      };
+    }
+  };
+
+  $scope.myModel = 0;
+}]);
+</script>
+
+<div ng-app="myApp">
+  <div ng-controller="MyCtrl">
+    {{ data[myModel] }}
+    <input combobox ng-model="myModel" data="data" options="options">
+  </div>
+</div>
