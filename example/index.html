@@ -16,12 +16,15 @@ function($scope, $timeout) {
     {
       id: 1,
       name: 'Number Two'
-    },
-    {
-      id: 2,
-      name: 'Number Three'
     }
   ];
+
+  $timeout(function(){
+    $scope.data.push({
+      id: 2,
+      name: 'Number Three'
+    });
+  }, 1000);
 
   $scope.options = {
     formatOption: function(option){
@@ -40,5 +43,8 @@ function($scope, $timeout) {
   <div ng-controller="MyCtrl">
     {{ data[myModel] }}
     <input combobox ng-model="myModel" data="data" options="options">
+
+    <br><br>
+    {{ data }}
   </div>
 </div>

@@ -8,49 +8,75 @@ angular.module('ngCombobox', [])
         data: '=',
         options: '='
       },
-      link: function($scope, $element, $attr, ctrl){
+      link: function($scope, $input, $attrs, ctrl){
         var options = $.extend({}, $scope.options);
         // Let's make a container for our controls
-        var $combobox = $element.wrap('<div class="combobox"></div>').parent();
+        var $combobox = $input.wrap('<div class="combobox"></div>').parent();
 
-        console.log($element, $combobox);
+        console.log($input, $combobox);
         // Add an open button
         var $open = $('<span class="open">Open</span>');
         $combobox.append($open);
 
-        var $options = $('<ul />');
+        var $options = $('<ul class="options" />');
 
         $options.hide();
 
         // Build options list
-        $.each($scope.data, function(index, item){
-          item = options.formatOption ? options.formatOption(item) : item;
+        var buildOptions = function(){
+          $options.empty();
 
-          $options.append('<li data-value="' + item.value + '">' + item.text + '</li>');
-        });
+          $.each($scope.data, function(index, item){
+            item = options.formatOption ? options.formatOption(item) : item;
 
+            $options.append('<li class="option" data-value="' + item.value + '">' + item.text + '</li>');
+          });
+        };
+
+        // Build initial options
+        buildOptions();
+
+        // Append the options item to the dom
+        $combobox.append($options);
+
+        // Handle clicks on options
         $options.delegate('li', 'click', function(event){
           var selectedValue = $(this).attr('data-value');
-          $element.val(selectedValue);
-          $element.trigger('input');
-        });
-
-        $open.on('click', function(){
+          $input.val(selectedValue);
+          $input.trigger('input');
           $options.toggle();
         });
 
-        $combobox.append($options);
+        // Open/close the options when the open button is clicked
+        $open.on('click', function(){
+          $options.toggle();
+          $input.focus();
+        });
 
+        // Listen for the data to change and update options
+        $scope.$watchCollection('data', function(newVal, oldVal){
+          console.log('data changed', newVal, newVal == oldVal);
+          if (newVal != oldVal) {
+            buildOptions();
+          }
+        });
+
+        console.log('data', $scope.data);
 
         // var updateValue = function(){
-        //   $element.val($input.val());
-        //   // $element.removeClass('ng-pristine');
-        //   // $element.addClass('ng-dirty');
-        //   $element.trigger('input');
+        //   $input.val($input.val());
+        //   // $input.removeClass('ng-pristine');
+        //   // $input.addClass('ng-dirty');
+        //   $input.trigger('input');
 
         // };
 
         // $el.on('keyup', _.debounce(updateValue, 250));
+
+        $input.on('$destroy', function() {
+          $open.off();
+          $options.undelegate();
+        });
       }
     };
   }]);
