@@ -14,11 +14,11 @@ angular.module('ngCombobox', [])
     return {
       scope: {
         data: '=',
-        options: '=',
+        params: '=',
         model: '=ngModel'
       },
       link: function($scope, $element, $attrs, ctrl){
-        var options = $.extend({}, $scope.options);
+        var params = $.extend({}, $scope.params);
 
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
@@ -35,7 +35,7 @@ angular.module('ngCombobox', [])
           $scope.options = [];
 
           $.each($scope.data, function(index, item){
-            $scope.options.push(options.formatOption ? options.formatOption(item) : item);
+            $scope.options.push(params.formatOption ? params.formatOption(item) : item);
           });
         };
 

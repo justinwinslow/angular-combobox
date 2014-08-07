@@ -29,7 +29,7 @@ function($scope, $timeout) {
     });
   }, 1000);
 
-  $scope.options = {
+  $scope.params = {
     formatOption: function(option){
       return {
         value: option.id,
@@ -44,7 +44,7 @@ function($scope, $timeout) {
 
 <div ng-app="myApp">
   <div ng-controller="MyCtrl">
-    <input combobox ng-model="myModel" data="data" options="options">
+    <input combobox ng-model="myModel" data="data" params="params">
 
     <ul>
       <li>Value: {{ myModel }}</li>
