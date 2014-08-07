@@ -1,6 +1,11 @@
 (function(angular, $, _){
 'use strict';
 
+var template = '<div class="combobox">' +
+  '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup(selected.text)">' +
+  '<span class="open" ng-click="toggleOptions()">Open</span>' +
+'</div>';
+
 angular.module('ngCombobox', [])
   .directive('combobox', ['$parse', '$animate', '$compile', '$timeout', function($parse, $animate, $compile, $timeout) {
     return {
@@ -13,18 +18,10 @@ angular.module('ngCombobox', [])
         var options = $.extend({}, $scope.options);
 
         // Let's make a container for our controls
-        var $combobox = $valueInput.wrap('<div class="combobox"></div>').parent();
+        var $combobox = $compile(template)($scope);
 
         // Hide our value storing input
-        $valueInput.hide();
-
-        // Create a new input for display purposes
-        var $displayInput = $compile('<input type="text" ng-model="selected.text">')($scope);
-        $combobox.append($displayInput);
-
-        // Add an open button
-        var $open = $compile('<span class="open" ng-click="toggleOptions()">Open</span>')($scope);
-        $combobox.append($open);
+        $valueInput.replaceWith($combobox);
 
         // Build our options drop down
         var $options = $compile(
@@ -60,33 +57,23 @@ angular.module('ngCombobox', [])
 
         // Set the new selected option
         var setSelected = function(value){
-          $scope.selected = $.grep($scope.options, function(option){
-            return option.value == value;
-          })[0] || {value: value, text: value};
+          $scope.selected = _.clone(_.find($scope.options, {value: value})) || {value: value, text: value};
         };
 
-        $displayInput.on('keyup', _.debounce(function(){
-          // Store the input "search" text
-          var text = $(this).val();
+        $scope.handleKeyup = function(text){
           // See if there's an option that matches
           var option = _.find($scope.options, {text: text});
 
-          // Set the model
-          // NOTE - This is wrapped in a $timeout to make it part of a digest
-          // cycle so the view updates properly
-          $timeout(function(){
-            if (option) {
-              $scope.model = option.value;
-            } else {
-              $scope.model = text;
-            }
-          });
-        }, 250));
+          if (option) {
+            $scope.model = option.value;
+          } else {
+            $scope.model = text;
+          }
+        };
 
         // Open/close the options when the open button is clicked
         $scope.toggleOptions = function(){
           $scope.showOptions = !$scope.showOptions;
-          $displayInput.focus();
         };
 
         // Listen for the data to change and update options
