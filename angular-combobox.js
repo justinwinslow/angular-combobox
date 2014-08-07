@@ -21,6 +21,8 @@ angular.module('ngCombobox', [])
       link: function($scope, $element, $attrs, ctrl){
         var params = $.extend({}, $scope.params);
 
+        $scope.data = $scope.data || [];
+
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
 
