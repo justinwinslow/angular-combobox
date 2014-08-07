@@ -32,8 +32,11 @@
   padding: 0;
   margin: 0;
   border: 1px solid #ccc;
+  border-top: none;
   background: #fff;
   list-style-type: none;
+  max-height: 240px;
+  overflow: auto;
 }
 
 .combobox .options .option {

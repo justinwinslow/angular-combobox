@@ -2,78 +2,121 @@
 'use strict';
 
 angular.module('ngCombobox', [])
-  .directive('combobox', ['$parse', '$animate', function($parse, $animate) {
+  .directive('combobox', ['$parse', '$animate', '$compile', '$timeout', function($parse, $animate, $compile, $timeout) {
     return {
       scope: {
         data: '=',
-        options: '='
+        options: '=',
+        model: '=ngModel'
       },
-      link: function($scope, $input, $attrs, ctrl){
+      link: function($scope, $valueInput, $attrs, ctrl){
+        // $scope.model = 1;
         var options = $.extend({}, $scope.options);
-        // Let's make a container for our controls
-        var $combobox = $input.wrap('<div class="combobox"></div>').parent();
 
-        console.log($input, $combobox);
+        // Let's make a container for our controls
+        var $combobox = $valueInput.wrap('<div class="combobox"></div>').parent();
+
+        // Hide our value storing input
+        $valueInput.hide();
+
+        // Create a new input for display purposes
+        var $displayInput = $compile('<input type="text" ng-model="selected.text">')($scope);
+        $combobox.append($displayInput);
+
         // Add an open button
         var $open = $('<span class="open">Open</span>');
         $combobox.append($open);
 
-        var $options = $('<ul class="options" />');
+        // Build our options drop down
+        var $options = $compile(
+          '<ul class="options">' +
+            '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
+          '</ul>'
+        )($scope);
 
         $options.hide();
 
+        // Append the options item to the dom
+        $combobox.append($options);
+
+        $scope.options = [];
+
         // Build options list
         var buildOptions = function(){
-          $options.empty();
+          $scope.options = [];
 
           $.each($scope.data, function(index, item){
-            item = options.formatOption ? options.formatOption(item) : item;
-
-            $options.append('<li class="option" data-value="' + item.value + '">' + item.text + '</li>');
+            $scope.options.push(options.formatOption ? options.formatOption(item) : item);
           });
         };
 
         // Build initial options
         buildOptions();
 
-        // Append the options item to the dom
-        $combobox.append($options);
+        var setValue = function(item){
+          $scope.selected = item;
 
-        // Handle clicks on options
-        $options.delegate('li', 'click', function(event){
-          var selectedValue = $(this).attr('data-value');
-          $input.val(selectedValue);
-          $input.trigger('input');
+          $options.hide();
+
+          $valueInput.val(item.value);
+          $valueInput.trigger('input');
+        };
+
+
+
+        $scope.selectOption = function(option){
           $options.toggle();
-        });
+          $scope.model = option.value;
+        };
+
+        var setSelected = function(value){
+          $scope.selected = $.grep($scope.options, function(option){
+            return option.value == value;
+          })[0] || {value: value, text: value};
+        };
+
+        $displayInput.on('keyup', _.debounce(function(){
+          var text = $(this).val();
+          var option = _.find($scope.options, {text: text});
+
+          $timeout(function(){
+            if (option) {
+              $scope.model = option.value;
+            } else {
+              $scope.model = text;
+            }
+          });
+        }, 250));
 
         // Open/close the options when the open button is clicked
         $open.on('click', function(){
           $options.toggle();
-          $input.focus();
+          $valueInput.focus();
         });
 
         // Listen for the data to change and update options
         $scope.$watchCollection('data', function(newVal, oldVal){
-          console.log('data changed', newVal, newVal == oldVal);
           if (newVal != oldVal) {
             buildOptions();
           }
         });
 
-        console.log('data', $scope.data);
+        $scope.$watch('model', function(newVal, oldVal){
+          console.log('heard ngModel change', arguments);
+          setSelected(newVal);
+        });
 
         // var updateValue = function(){
-        //   $input.val($input.val());
-        //   // $input.removeClass('ng-pristine');
-        //   // $input.addClass('ng-dirty');
-        //   $input.trigger('input');
+        //   $valueInput.val($valueInput.val());
+        //   // $valueInput.removeClass('ng-pristine');
+        //   // $valueInput.addClass('ng-dirty');
+        //   $valueInput.trigger('input');
 
         // };
 
         // $el.on('keyup', _.debounce(updateValue, 250));
 
-        $input.on('$destroy', function() {
+        $valueInput.on('$destroy', function() {
           $open.off();
           $options.undelegate();
         });
