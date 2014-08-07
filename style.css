@@ -37,9 +37,8 @@
   top: 100%;
   min-width: 100%;
   padding: 0;
-  margin: 0;
+  margin: -1px 0 0;
   border: 1px solid #ccc;
-  border-top: none;
   background: #fff;
   list-style-type: none;
   max-height: 240px;
