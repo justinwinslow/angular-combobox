@@ -23,17 +23,17 @@ angular.module('ngCombobox', [])
         $combobox.append($displayInput);
 
         // Add an open button
-        var $open = $('<span class="open">Open</span>');
+        var $open = $compile('<span class="open" ng-click="toggleOptions()">Open</span>')($scope);
         $combobox.append($open);
 
         // Build our options drop down
         var $options = $compile(
-          '<ul class="options">' +
+          '<ul class="options" ng-show="showOptions">' +
             '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
           '</ul>'
         )($scope);
 
-        $options.hide();
+        $scope.showOptions = false;
 
         // Append the options item to the dom
         $combobox.append($options);
@@ -54,7 +54,7 @@ angular.module('ngCombobox', [])
 
         // UI method for updating the model on selection
         $scope.selectOption = function(option){
-          $options.toggle();
+          $scope.showOptions = false;
           $scope.model = option.value;
         };
 
@@ -84,10 +84,10 @@ angular.module('ngCombobox', [])
         }, 250));
 
         // Open/close the options when the open button is clicked
-        $open.on('click', function(){
-          $options.toggle();
-          $valueInput.focus();
-        });
+        $scope.toggleOptions = function(){
+          $scope.showOptions = !$scope.showOptions;
+          $displayInput.focus();
+        };
 
         // Listen for the data to change and update options
         $scope.$watchCollection('data', function(newVal, oldVal){
@@ -105,8 +105,6 @@ angular.module('ngCombobox', [])
         // Clean up
         $scope.$on('$destroy', function(){
           $displayInput.off();
-          $open.off();
-          $options.undelegate();
         });
       }
     };
