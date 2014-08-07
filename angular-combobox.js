@@ -4,8 +4,8 @@
 var template = '<div class="combobox">' +
   '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup(selected.text)">' +
   '<span class="open" ng-click="toggleOptions()">Open</span>' +
-  '<ul class="options" ng-show="showOptions">' +
-    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-show="option.text.indexOf(selected.text) >= 0">{{option.text}}</li>' +
+  '<ul class="options" ng-show="showOptions && options.length">' +
+    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
   '</ul>' +
 '</div>';
 
@@ -34,11 +34,16 @@ angular.module('ngCombobox', [])
         $scope.options = [];
 
         // Build options list
-        var buildOptions = function(){
+        var buildOptions = function(filter){
           $scope.options = [];
 
+          filter = filter || '';
+
           $.each($scope.data, function(index, item){
-            $scope.options.push(params.formatOption ? params.formatOption(item) : item);
+            var option = params.formatOption ? params.formatOption(item) : item;
+            if (option.text.indexOf(filter) >= 0) {
+              $scope.options.push(option);
+            }
           });
         };
 
@@ -56,21 +61,24 @@ angular.module('ngCombobox', [])
           $scope.selected = _.clone(_.find($scope.options, {value: value})) || {value: value, text: value};
         };
 
-        $scope.handleKeyup = function(text){
-          // Show dropdown while typing
-          if (!$scope.showOptions) {
-            $scope.showOptions = true;
-          }
+        $scope.handleKeyup = _.debounce(function(text){
+          $scope.$apply(function(){
+            buildOptions(text);
+            // Show dropdown while typing
+            if (!$scope.showOptions) {
+              $scope.showOptions = true;
+            }
 
-          // See if there's an option that matches
-          var option = _.find($scope.options, {text: text});
+            // See if there's an option that matches
+            var option = _.find($scope.options, {text: text});
 
-          if (option) {
-            $scope.model = option.value;
-          } else {
-            $scope.model = text;
-          }
-        };
+            if (option) {
+              $scope.model = option.value;
+            } else {
+              $scope.model = text;
+            }
+          });
+        }, 200);
 
         // Open/close the options when the open button is clicked
         $scope.toggleOptions = function(){
