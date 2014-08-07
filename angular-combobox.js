@@ -10,7 +10,6 @@ angular.module('ngCombobox', [])
         model: '=ngModel'
       },
       link: function($scope, $valueInput, $attrs, ctrl){
-        // $scope.model = 1;
         var options = $.extend({}, $scope.options);
 
         // Let's make a container for our controls
@@ -53,22 +52,13 @@ angular.module('ngCombobox', [])
         // Build initial options
         buildOptions();
 
-        var setValue = function(item){
-          $scope.selected = item;
-
-          $options.hide();
-
-          $valueInput.val(item.value);
-          $valueInput.trigger('input');
-        };
-
-
-
+        // UI method for updating the model on selection
         $scope.selectOption = function(option){
           $options.toggle();
           $scope.model = option.value;
         };
 
+        // Set the new selected option
         var setSelected = function(value){
           $scope.selected = $.grep($scope.options, function(option){
             return option.value == value;
@@ -76,9 +66,14 @@ angular.module('ngCombobox', [])
         };
 
         $displayInput.on('keyup', _.debounce(function(){
+          // Store the input "search" text
           var text = $(this).val();
+          // See if there's an option that matches
           var option = _.find($scope.options, {text: text});
 
+          // Set the model
+          // NOTE - This is wrapped in a $timeout to make it part of a digest
+          // cycle so the view updates properly
           $timeout(function(){
             if (option) {
               $scope.model = option.value;
@@ -101,22 +96,15 @@ angular.module('ngCombobox', [])
           }
         });
 
+        // Listen for the model to change
         $scope.$watch('model', function(newVal, oldVal){
-          console.log('heard ngModel change', arguments);
+          // Update selected with new value if it's changed
           setSelected(newVal);
         });
 
-        // var updateValue = function(){
-        //   $valueInput.val($valueInput.val());
-        //   // $valueInput.removeClass('ng-pristine');
-        //   // $valueInput.addClass('ng-dirty');
-        //   $valueInput.trigger('input');
-
-        // };
-
-        // $el.on('keyup', _.debounce(updateValue, 250));
-
-        $valueInput.on('$destroy', function() {
+        // Clean up
+        $scope.$on('$destroy', function(){
+          $displayInput.off();
           $open.off();
           $options.undelegate();
         });
