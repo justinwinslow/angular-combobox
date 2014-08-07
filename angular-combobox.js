@@ -4,6 +4,9 @@
 var template = '<div class="combobox">' +
   '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup(selected.text)">' +
   '<span class="open" ng-click="toggleOptions()">Open</span>' +
+  '<ul class="options" ng-show="showOptions">' +
+    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
+  '</ul>' +
 '</div>';
 
 angular.module('ngCombobox', [])
@@ -17,23 +20,13 @@ angular.module('ngCombobox', [])
       link: function($scope, $valueInput, $attrs, ctrl){
         var options = $.extend({}, $scope.options);
 
-        // Let's make a container for our controls
+        // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
 
-        // Hide our value storing input
+        // Replace input with combobox
         $valueInput.replaceWith($combobox);
 
-        // Build our options drop down
-        var $options = $compile(
-          '<ul class="options" ng-show="showOptions">' +
-            '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
-          '</ul>'
-        )($scope);
-
         $scope.showOptions = false;
-
-        // Append the options item to the dom
-        $combobox.append($options);
 
         $scope.options = [];
 
