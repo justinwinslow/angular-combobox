@@ -18,11 +18,18 @@
   background: #eee;
   border: 1px solid #ccc;
   border-left: none;
-  font-size: 12px;
+  font-size: 0;
   height: 24px;
+  width: 24px;
   line-height: 24px;
   padding: 0 3px;
   display: inline-block;
+  text-align: center;
+}
+
+.combobox .open:before {
+  content: '\25BE';
+  font-size: 12px;
 }
 
 .combobox .options {
@@ -52,14 +59,3 @@
 .combobox .options .option:last-child {
   border-bottom: none;
 }
-
-/* Advanced styles */
-
-/*.combobox .open {
-  font-size: 0;
-}
-
-.combobox .open:before {
-  content: '▾';
-  font-size: 12px;
-}*/
