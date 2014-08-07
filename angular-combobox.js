@@ -10,7 +10,8 @@ var template = '<div class="combobox">' +
 '</div>';
 
 angular.module('ngCombobox', [])
-  .directive('combobox', ['$parse', '$animate', '$compile', '$timeout', function($parse, $animate, $compile, $timeout) {
+  .directive('combobox', ['$parse', '$animate', '$compile', '$timeout', '$document',
+  function($parse, $animate, $compile, $timeout, $document) {
     return {
       scope: {
         data: '=',
@@ -82,9 +83,24 @@ angular.module('ngCombobox', [])
           setSelected(newVal);
         });
 
+        // Hide options when user clicks outside
+        var hideOptions = function(event){
+          var isChild = $combobox.has(event.target).length > 0;
+          var isSelf = $combobox[0] == event.target;
+          var isInside = isChild || isSelf;
+
+          if (!isInside) {
+            $scope.$apply(function(){
+              $scope.showOptions = false;
+            });
+          }
+        };
+
+        $document.on('click', hideOptions);
+
         // Clean up
         $scope.$on('$destroy', function(){
-          $displayInput.off();
+          $document.off('click', hideOptions);
         });
       }
     };
