@@ -10,8 +10,8 @@ var template = '<div class="combobox">' +
 '</div>';
 
 angular.module('ngCombobox', [])
-  .directive('combobox', ['$parse', '$animate', '$compile', '$timeout', '$document',
-  function($parse, $animate, $compile, $timeout, $document) {
+  .directive('combobox', ['$parse', '$animate', '$compile', '$document',
+  function($parse, $animate, $compile, $document) {
     return {
       scope: {
         data: '=',
