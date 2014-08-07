@@ -38,17 +38,23 @@ function($scope, $timeout) {
     }
   };
 
-  $scope.myModel = 0;
+  $scope.id = 0;
+
+  $scope.myModel = _.find($scope.data, {id: $scope.id});
+
+  $scope.$watch('id', function(newVal){
+    $scope.myModel = _.find($scope.data, {id: newVal});
+  })
 }]);
 </script>
 
 <div ng-app="myApp">
   <div ng-controller="MyCtrl">
-    <input combobox ng-model="myModel" data="data" params="params">
+    <input combobox ng-model="id" data="data" params="params">
 
     <ul>
-      <li>Value: {{ myModel }}</li>
-      <li>Selected model: {{ data[myModel] || 'none' }}</li>
+      <li>Value: {{ id }}</li>
+      <li>Selected model: {{ myModel || 'none' }}</li>
     </ul>
   </div>
 </div>
