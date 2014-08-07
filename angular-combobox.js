@@ -17,14 +17,14 @@ angular.module('ngCombobox', [])
         options: '=',
         model: '=ngModel'
       },
-      link: function($scope, $valueInput, $attrs, ctrl){
+      link: function($scope, $element, $attrs, ctrl){
         var options = $.extend({}, $scope.options);
 
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
 
         // Replace input with combobox
-        $valueInput.replaceWith($combobox);
+        $element.replaceWith($combobox);
 
         $scope.showOptions = false;
 
