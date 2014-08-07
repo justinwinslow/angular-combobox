@@ -5,7 +5,7 @@ var template = '<div class="combobox">' +
   '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup(selected.text)">' +
   '<span class="open" ng-click="toggleOptions()">Open</span>' +
   '<ul class="options" ng-show="showOptions">' +
-    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
+    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-show="option.text.indexOf(selected.text) >= 0">{{option.text}}</li>' +
   '</ul>' +
 '</div>';
 
@@ -57,6 +57,11 @@ angular.module('ngCombobox', [])
         };
 
         $scope.handleKeyup = function(text){
+          // Show dropdown while typing
+          if (!$scope.showOptions) {
+            $scope.showOptions = true;
+          }
+
           // See if there's an option that matches
           var option = _.find($scope.options, {text: text});
 
