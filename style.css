@@ -55,8 +55,8 @@
   cursor: default;
 }
 
-.combobox .options .option:hover {
-  background-color: #fafafa;
+.combobox .options .option:hover, .combobox .options .option.hilighted {
+  background-color: #f5f5f5;
 }
 
 .combobox .options .option:last-child {
