@@ -8,7 +8,6 @@ Select and raw text entry combo input for angular.
 ```html
 
 <input type="text" ng-model="someModel" data="someArrayOfOptions" params="params">
-
 ```
 
 ## data
@@ -19,11 +18,22 @@ The data attribute should be set to the array of options that are possible for t
 
 * `formatOption` - function to conform your data to the format used by angular-combobox. Example:
 ```javascript
+// If your data schema looks like: {id: 0, name: 'Model Name'}
 $scope.params = {
   formatOption: function(option){
     return {
       value: option.id,
       text: option.name
+    };
+  }
+}
+
+// If your data is just an array of strings
+$scope.params = {
+  formatOption: function(option){
+    return {
+      value: option,
+      text: option
     };
   }
 }
