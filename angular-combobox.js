@@ -3,11 +3,11 @@
 
 var template = '<div class="combobox">' +
   '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup(selected.text)">' +
-  '<span class="open" ng-click="toggleOptions()">Open</span>' +
+  '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
   '<ul class="options" ng-show="showOptions && options.length">' +
     '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
   '</ul>' +
-'</div>';
+'</div>{{options.length}}';
 
 angular.module('ngCombobox', [])
   .directive('combobox', ['$parse', '$animate', '$compile', '$document',
