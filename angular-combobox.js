@@ -2,10 +2,10 @@
 'use strict';
 
 var template = '<div class="combobox">' +
-  '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup(selected.text)">' +
+  '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
   '<ul class="options" ng-show="showOptions && options.length">' +
-    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)">{{option.text}}</li>' +
+    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
   '</ul>' +
 '</div>{{options.length}}';
 
@@ -61,13 +61,9 @@ angular.module('ngCombobox', [])
           $scope.selected = _.clone(_.find($scope.options, {value: value})) || {value: value, text: value};
         };
 
-        $scope.handleKeyup = _.debounce(function(text){
+        var filterOptions = _.debounce(function(text){
           $scope.$apply(function(){
             buildOptions(text);
-            // Show dropdown while typing
-            if (!$scope.showOptions) {
-              $scope.showOptions = true;
-            }
 
             // See if there's an option that matches
             var option = _.find($scope.options, {text: text});
@@ -78,17 +74,52 @@ angular.module('ngCombobox', [])
               $scope.model = text;
             }
           });
-        }, 200);
+        }, 100);
+
+        $scope.hilighted = null;
+
+        $scope.handleKeyup = function(event, text){
+          // Show dropdown while typing
+          if (!$scope.showOptions) {
+            $scope.showOptions = true;
+          }
+
+          if (event.keyCode == 40) {
+            // Handle down arrow
+            if ($scope.hilighted == null) {
+              $scope.hilighted = 0;
+            } else if ($scope.hilighted < ($scope.options.length - 1)) {
+              $scope.hilighted++;
+            }
+          } else if (event.keyCode == 38) {
+            // Handle up arrow
+            if ($scope.hilighted > 0) {
+              $scope.hilighted--;
+            }
+          } else if (event.keyCode == 13) {
+            // Handle enter
+            $scope.selectOption($scope.options[$scope.hilighted]);
+            $scope.hilighted = null;
+          }
+        };
 
         // Open/close the options when the open button is clicked
         $scope.toggleOptions = function(){
           $scope.showOptions = !$scope.showOptions;
+          $combobox.find('input').focus();
         };
 
         // Listen for the data to change and update options
         $scope.$watchCollection('data', function(newVal, oldVal){
           if (newVal != oldVal) {
             buildOptions();
+          }
+        });
+
+        // Listen for the input value to change and handle any side effects
+        $scope.$watch('selected.text', function(newVal, oldVal){
+          if (newVal != oldVal) {
+            filterOptions(newVal);
           }
         });
 
