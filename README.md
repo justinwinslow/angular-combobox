@@ -41,6 +41,8 @@ $scope.params = {
 
 ## TODO
 
+* Placeholder text
+* Make it work with select boxes?
 * Selectively position options dropdown up or down depending on input position on screen
 * Better handling of no data being set
 * Better docs
