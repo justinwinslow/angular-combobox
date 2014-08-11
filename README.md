@@ -45,3 +45,4 @@ $scope.params = {
 * Better handling of no data being set
 * Better docs
 * Consider accepting and array of strings natively
+* Bower registry
