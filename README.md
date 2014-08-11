@@ -3,18 +3,18 @@ angular-combobox
 
 Select and raw text entry combo input for angular.
 
-### Example
+## Example
 
 ```html
 
 <input type="text" ng-model="someModel" data="someArrayOfOptions" params="params">
 ```
 
-## data
+### data
 
 The data attribute should be set to the array of options that are possible for the input. This can be an array of strings or objects. The option format used by angular-combobox is `{value: 'value', text: 'text'}` but it is not required that your data conform to this schema. You can use the formatOption parameter to tell the directive how it should interpret your data.
 
-## params
+### params
 
 * `formatOption` - function to conform your data to the format used by angular-combobox. Example:
 ```javascript
@@ -39,7 +39,7 @@ $scope.params = {
 }
 ```
 
-### TODO
+## TODO
 
 * Selectively position options dropdown up or down depending on input position on screen
 * Better handling of no data being set
