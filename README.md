@@ -42,9 +42,9 @@ $scope.params = {
 ## TODO
 
 * Placeholder text
-* Make it work with select boxes?
 * Selectively position options dropdown up or down depending on input position on screen
 * Better handling of no data being set
 * Better docs
-* Consider accepting and array of strings natively
+* Consider accepting an array of strings natively
 * Bower registry
+* Make it work with select boxes? (Started on this, decided it wasn't a good idea)
