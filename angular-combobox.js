@@ -2,7 +2,7 @@
 'use strict';
 
 var template = '<div class="combobox">' +
-  '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)">' +
+  '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
   '<ul class="options" ng-show="showOptions && options.length">' +
     '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
@@ -32,6 +32,9 @@ angular.module('ngCombobox', [])
         $scope.showOptions = false;
 
         $scope.options = [];
+
+        // Grab placeholder if provided
+        $scope.placeholder = $element.attr('placeholder') || null;
 
         // Build options list
         var buildOptions = function(filter){
