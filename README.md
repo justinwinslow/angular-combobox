@@ -41,9 +41,7 @@ $scope.params = {
 
 ## TODO
 
-* Placeholder text
 * Selectively position options dropdown up or down depending on input position on screen
-* Better handling of no data being set
 * Better docs
 * Consider accepting an array of strings natively
 * Bower registry

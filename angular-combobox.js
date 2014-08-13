@@ -21,8 +21,6 @@ angular.module('ngCombobox', [])
       link: function($scope, $element, $attrs, ctrl){
         var params = $.extend({}, $scope.params);
 
-        $scope.data = $scope.data || [];
-
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
 
@@ -42,12 +40,14 @@ angular.module('ngCombobox', [])
 
           filter = filter || '';
 
-          $.each($scope.data, function(index, item){
-            var option = params.formatOption ? params.formatOption(item) : item;
-            if (option.text.indexOf(filter) >= 0) {
-              $scope.options.push(option);
-            }
-          });
+          if ($scope.data) {
+            _.each($scope.data, function(item){
+              var option = params.formatOption ? params.formatOption(item) : item;
+              if (option.text.indexOf(filter) >= 0) {
+                $scope.options.push(option);
+              }
+            });
+          }
         };
 
         // Build initial options
