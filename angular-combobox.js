@@ -41,6 +41,7 @@ angular.module('ngCombobox', [])
           $scope.options = [];
 
           filter = filter || '';
+          filter = filter.toLowerCase();
 
           if ($scope.data) {
             _.each($scope.data, function(item){
@@ -56,7 +57,7 @@ angular.module('ngCombobox', [])
               }
 
               // If the item text matches the current input text, push it to the options
-              if (item.text.indexOf(filter) >= 0) {
+              if (item.text.toLowerCase().indexOf(filter) >= 0) {
                 $scope.options.push(item);
               }
             });
