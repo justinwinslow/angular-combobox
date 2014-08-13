@@ -50,6 +50,11 @@
   overflow: auto;
 }
 
+.combobox .options.flip {
+  top: auto;
+  bottom: 100%;
+}
+
 .combobox .options .option {
   border-bottom: 1px solid #eee;
   padding: 3px 6px;

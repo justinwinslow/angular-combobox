@@ -137,6 +137,19 @@ angular.module('ngCombobox', [])
           }
         });
 
+        $scope.$watch('showOptions', function(val){
+          if (val) {
+            var $options = $combobox.find('.options');
+            var bottomEdge = $combobox.offset().top + $combobox.height() + $options.height();
+
+            if (bottomEdge + 24 > $(window).height()) {
+              $options.addClass('flip');
+            } else {
+              $options.removeClass('flip');
+            }
+          }
+        });
+
         // Listen for the model to change
         $scope.$watch('model', function(newVal, oldVal){
           // Update selected with new value if it's changed
