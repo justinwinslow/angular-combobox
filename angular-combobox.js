@@ -1,7 +1,7 @@
 (function(angular, $, _){
 'use strict';
 
-var template = '<div class="combobox">' +
+var template = '<div class="combobox {{ params.addClass }}">' +
   '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
   '<ul class="options" ng-show="showOptions && options.length">' +

@@ -32,6 +32,12 @@ $scope.params = {
   }
 }
 ```
+* `addClass` - string of classes to add to the root element. All elements are nested inside the root, so you can use this class to cascade down any custom or conditional styles you want to add.
+```javascript
+$scope.params = {
+  addClass: 'someClass'
+}
+```
 
 ## TODO
 
