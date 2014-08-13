@@ -1,7 +1,7 @@
 (function(angular, $, _){
 'use strict';
 
-var template = '<div class="combobox {{ params.addClass }}">' +
+var template = '<div class="combobox {{ addClass }} {{ params.addClass }}">' +
   '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
   '<ul class="options" ng-show="showOptions && options.length">' +
@@ -23,6 +23,8 @@ angular.module('ngCombobox', [])
 
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
+
+        $scope.addClass = $attrs.class;
 
         // Replace input with combobox
         $element.replaceWith($combobox);
