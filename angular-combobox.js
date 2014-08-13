@@ -140,6 +140,7 @@ angular.module('ngCombobox', [])
           }
         });
 
+        // Watch for show options to change and check whether options needs to be flipped
         $scope.$watch('showOptions', function(val){
           if (val) {
             var $options = $combobox.find('.options');
