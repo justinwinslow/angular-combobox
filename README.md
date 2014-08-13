@@ -43,6 +43,5 @@ $scope.params = {
 
 * Selectively position options dropdown up or down depending on input position on screen
 * Better docs
-* Consider accepting an array of strings natively
 * Bower registry
 * Make it work with select boxes? (Started on this, decided it wasn't a good idea)

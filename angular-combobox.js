@@ -42,9 +42,20 @@ angular.module('ngCombobox', [])
 
           if ($scope.data) {
             _.each($scope.data, function(item){
-              var option = params.formatOption ? params.formatOption(item) : item;
-              if (option.text.indexOf(filter) >= 0) {
-                $scope.options.push(option);
+              // If a format function has been provided, let's use it
+              item = params.formatOption ? params.formatOption(item) : item;
+
+              // If item is a string let's conform it to our options format
+              if (typeof item == 'string') {
+                item = {
+                  value: item,
+                  text: item
+                };
+              }
+
+              // If the item text matches the current input text, push it to the options
+              if (item.text.indexOf(filter) >= 0) {
+                $scope.options.push(item);
               }
             });
           }
