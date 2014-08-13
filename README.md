@@ -43,4 +43,3 @@ $scope.params = {
 
 * Better docs
 * Bower registry
-* Make it work with select boxes? (Started on this, decided it wasn't a good idea)
