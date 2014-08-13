@@ -4,7 +4,7 @@
 var template = '<div class="combobox {{ addClass }} {{ params.addClass }}">' +
   '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
-  '<ul class="options" ng-show="showOptions && options.length">' +
+  '<ul class="options" ng-show="showOptions && options.length" ng-class="{flip: flip}">' +
     '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
   '</ul>' +
 '</div>{{options.length}}';
@@ -146,9 +146,9 @@ angular.module('ngCombobox', [])
             var bottomEdge = $combobox.offset().top + $combobox.height() + $options.height();
 
             if (bottomEdge + 24 > $(window).height()) {
-              $options.addClass('flip');
+              $scope.flip = true;
             } else {
-              $options.removeClass('flip');
+              $scope.flip = false;
             }
           }
         });
