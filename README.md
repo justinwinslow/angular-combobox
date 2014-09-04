@@ -38,7 +38,3 @@ $scope.params = {
   addClass: 'someClass'
 }
 ```
-
-## TODO
-
-* Bower registry
