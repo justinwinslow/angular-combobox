@@ -24,12 +24,14 @@ angular.module('ngCombobox', [])
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
 
+        // Add any classes from the old element to $scope
         $scope.addClass = $attrs.class;
+
+        // Default to hidding the options
+        $scope.showOptions = false;
 
         // Replace input with combobox
         $element.replaceWith($combobox);
-
-        $scope.showOptions = false;
 
         $scope.options = [];
 
@@ -63,9 +65,6 @@ angular.module('ngCombobox', [])
             });
           }
         };
-
-        // Build initial options
-        buildOptions();
 
         // UI method for updating the model on selection
         $scope.selectOption = function(option){
@@ -103,7 +102,7 @@ angular.module('ngCombobox', [])
 
           if (event.keyCode == 40) {
             // Handle down arrow
-            if ($scope.hilighted == null) {
+            if ($scope.hilighted === null) {
               $scope.hilighted = 0;
             } else if ($scope.hilighted < ($scope.options.length - 1)) {
               $scope.hilighted++;
@@ -134,6 +133,9 @@ angular.module('ngCombobox', [])
         });
 
         // Listen for the input value to change and handle any side effects
+        // NOTE - because a change always fires on the model at initialization,
+        // this handler will always fire one and the options will be ready when
+        // the user interacts with the combobox for the first time
         $scope.$watch('selected.text', function(newVal, oldVal){
           if (newVal != oldVal) {
             filterOptions(newVal);
