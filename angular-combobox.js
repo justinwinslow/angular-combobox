@@ -69,6 +69,9 @@ angular.module('ngCombobox', [])
           }
         };
 
+        // Build initial options
+        buildOptions();
+
         // UI method for updating the model on selection
         $scope.selectOption = function(option){
           $scope.showOptions = false;
@@ -79,6 +82,9 @@ angular.module('ngCombobox', [])
         var setSelected = function(value){
           $scope.selected = _.clone(_.find($scope.options, {value: value})) || {value: value, text: value};
         };
+
+        // Set selected immediately
+        setSelected($scope.model);
 
         var filterOptions = _.debounce(function(text){
           $scope.$apply(function(){
@@ -132,6 +138,7 @@ angular.module('ngCombobox', [])
         $scope.$watchCollection('data', function(newVal, oldVal){
           if (newVal != oldVal) {
             buildOptions();
+            setSelected($scope.model);
           }
         });
 
