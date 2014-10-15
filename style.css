@@ -57,6 +57,7 @@
 
 .combobox .options .option {
   border-bottom: 1px solid #eee;
+  margin: 0;
   padding: 3px 6px;
   cursor: default;
 }
