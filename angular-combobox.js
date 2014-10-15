@@ -56,9 +56,11 @@ angular.module('ngCombobox', [])
 
         // Set the new selected option
         var setSelected = $scope.setSelected = function(value){
-          $scope.selected = _.clone(_.find($scope.data, function(item){
-            return $scope.formatOption(item).value == value;
-          })) || {value: value, text: value};
+          $scope.$apply(function(){
+            $scope.selected = _.clone(_.find($scope.data, function(item){
+              return $scope.formatOption(item).value == value;
+            })) || {value: value, text: value};
+          });
         };
 
         var filterOptions = _.debounce(function(text){
