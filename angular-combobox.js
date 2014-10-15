@@ -31,7 +31,10 @@ angular.module('ngCombobox', [])
         $scope.showOptions = false;
 
         // Replace input with combobox
-        $element.replaceWith($combobox);
+        // Use timeout so it doesn't interrupt template rendering
+        $timeout(function(){
+          $element.replaceWith($combobox);
+        });
 
         $scope.options = [];
 
