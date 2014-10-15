@@ -2,12 +2,12 @@
 'use strict';
 
 var template = '<div class="combobox {{ addClass }} {{ params.addClass }}">' +
-  '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
+  '<input type="text" ng-focus="focus" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
-  '<ul class="options" ng-show="showOptions && options.length" ng-class="{flip: flip}">' +
-    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
+  '<ul class="options" ng-class="{flip: flip}" style="display: none">' +
+    '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option);toggleOptions();" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
   '</ul>' +
-'</div>{{options.length}}';
+'</div>';
 
 angular.module('ngCombobox', [])
   .directive('combobox', ['$compile', '$document', '$timeout',
@@ -18,31 +18,11 @@ angular.module('ngCombobox', [])
         params: '=',
         model: '=ngModel'
       },
-      link: function($scope, $element, $attrs, ctrl){
-        var params = $.extend({}, $scope.params);
-
-        // Compile the combobox template with our scope
-        var $combobox = $compile(template)($scope);
-
-        // Add any classes from the old element to $scope
-        $scope.addClass = $attrs.class;
-
-        // Default to hidding the options
-        $scope.showOptions = false;
-
-        // Replace input with combobox
-        // Use timeout so it doesn't interrupt template rendering
-        $timeout(function(){
-          $element.replaceWith($combobox);
-        });
-
+      controller: ['$scope', function($scope){
         $scope.options = [];
 
-        // Grab placeholder if provided
-        $scope.placeholder = $element.attr('placeholder') || null;
-
-        // Build options list
-        var buildOptions = function(filter){
+         // Build options list
+        var buildOptions = $scope.buildOptions = function(filter){
           $scope.options = [];
 
           filter = filter || '';
@@ -51,7 +31,7 @@ angular.module('ngCombobox', [])
           if ($scope.data) {
             _.each($scope.data, function(item){
               // If a format function has been provided, let's use it
-              item = params.formatOption ? params.formatOption(item) : item;
+              item = $scope.formatOption(item);
 
               // If item is a string let's conform it to our options format
               if (typeof item == 'string') {
@@ -69,22 +49,15 @@ angular.module('ngCombobox', [])
           }
         };
 
-        // Build initial options
-        buildOptions();
-
         // UI method for updating the model on selection
         $scope.selectOption = function(option){
-          $scope.showOptions = false;
           $scope.model = option.value;
         };
 
         // Set the new selected option
-        var setSelected = function(value){
+        var setSelected = $scope.setSelected = function(value){
           $scope.selected = _.clone(_.find($scope.options, {value: value})) || {value: value, text: value};
         };
-
-        // Set selected immediately
-        setSelected($scope.model);
 
         var filterOptions = _.debounce(function(text){
           $scope.$apply(function(){
@@ -100,6 +73,56 @@ angular.module('ngCombobox', [])
             }
           });
         }, 100);
+
+        // Listen for the data to change and update options
+        $scope.$watchCollection('data', function(newVal, oldVal){
+          if (newVal != oldVal) {
+            buildOptions();
+            setSelected($scope.model);
+          }
+        });
+
+        // Listen for the input value to change and handle any side effects
+        // NOTE - because a change always fires on the model at initialization,
+        // this handler will always fire one and the options will be ready when
+        // the user interacts with the combobox for the first time
+        $scope.$watch('selected.text', function(newVal, oldVal){
+          if (newVal != oldVal) {
+            filterOptions(newVal);
+          }
+        });
+
+        // Listen for the model to change
+        $scope.$watch('model', function(newVal, oldVal){
+          // Update selected with new value if it's changed
+          setSelected(newVal);
+        });
+      }],
+      link: function($scope, $element, $attrs, ctrl){
+        var params = $.extend({}, $scope.params);
+
+        // Compile the combobox template with our scope
+        var $combobox = $compile(template)($scope);
+        var $options = $combobox.find('.options');
+
+        // Add any classes from the old element to $scope
+        $scope.addClass = $attrs.class;
+
+        // Default to hidding the options
+        $scope.showOptions = false;
+
+        // Replace input with combobox
+        // Use timeout so it doesn't interrupt template rendering
+        $timeout(function(){
+          $element.replaceWith($combobox);
+          $scope.buildOptions();
+          $scope.setSelected($scope.model);
+        });
+
+        // Grab placeholder if provided
+        $scope.placeholder = $element.attr('placeholder') || null;
+
+        $scope.formatOption = params.formatOption || function(item) { return item; };
 
         $scope.hilighted = null;
 
@@ -130,32 +153,10 @@ angular.module('ngCombobox', [])
 
         // Open/close the options when the open button is clicked
         $scope.toggleOptions = function(){
-          $scope.showOptions = !$scope.showOptions;
-          $combobox.find('input').focus();
-        };
-
-        // Listen for the data to change and update options
-        $scope.$watchCollection('data', function(newVal, oldVal){
-          if (newVal != oldVal) {
-            buildOptions();
-            setSelected($scope.model);
-          }
-        });
-
-        // Listen for the input value to change and handle any side effects
-        // NOTE - because a change always fires on the model at initialization,
-        // this handler will always fire one and the options will be ready when
-        // the user interacts with the combobox for the first time
-        $scope.$watch('selected.text', function(newVal, oldVal){
-          if (newVal != oldVal) {
-            filterOptions(newVal);
-          }
-        });
-
-        // Watch for show options to change and check whether options needs to be flipped
-        $scope.$watch('showOptions', function(val){
-          if (val) {
-            var $options = $combobox.find('.options');
+          if ($options.is(':visible')) {
+            $options.hide();
+            $scope.focus = false;
+          } else {
             var bottomEdge = $combobox.offset().top + $combobox.height() + $options.height();
 
             if (bottomEdge + 24 > $(window).height()) {
@@ -163,14 +164,11 @@ angular.module('ngCombobox', [])
             } else {
               $scope.flip = false;
             }
-          }
-        });
 
-        // Listen for the model to change
-        $scope.$watch('model', function(newVal, oldVal){
-          // Update selected with new value if it's changed
-          setSelected(newVal);
-        });
+            $options.show();
+            $scope.focus = true;
+          }
+        };
 
         // Hide options when user clicks outside
         var hideOptions = function(event){
@@ -179,9 +177,8 @@ angular.module('ngCombobox', [])
           var isInside = isChild || isSelf;
 
           if (!isInside) {
-            $scope.$apply(function(){
-              $scope.showOptions = false;
-            });
+            $scope.focus = false;
+            $options.hide();
           }
         };
 
