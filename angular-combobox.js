@@ -4,7 +4,7 @@
 var template = '<div class="combobox {{ addClass }} {{ params.addClass }}">' +
   '<input type="text" ng-focus="focus" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
-  '<ul class="options" ng-class="{flip: flip}" style="display: none">' +
+  '<ul class="options" ng-class="{flip: flip}" ng-if="showOptions">' +
     '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option);toggleOptions();" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
   '</ul>' +
 '</div>';
@@ -56,7 +56,9 @@ angular.module('ngCombobox', [])
 
         // Set the new selected option
         var setSelected = $scope.setSelected = function(value){
-          $scope.selected = _.clone(_.find($scope.options, {value: value})) || {value: value, text: value};
+          $scope.selected = _.clone(_.find($scope.data, function(item){
+            return $scope.formatOption(item).value == value;
+          })) || {value: value, text: value};
         };
 
         var filterOptions = _.debounce(function(text){
@@ -94,8 +96,10 @@ angular.module('ngCombobox', [])
 
         // Listen for the model to change
         $scope.$watch('model', function(newVal, oldVal){
-          // Update selected with new value if it's changed
-          setSelected(newVal);
+          if (newVal != oldVal) {
+            // Update selected with new value if it's changed
+            setSelected(newVal);
+          }
         });
       }],
       link: function($scope, $element, $attrs, ctrl){
@@ -115,7 +119,6 @@ angular.module('ngCombobox', [])
         // Use timeout so it doesn't interrupt template rendering
         $timeout(function(){
           $element.replaceWith($combobox);
-          $scope.buildOptions();
           $scope.setSelected($scope.model);
         });
 
@@ -153,8 +156,8 @@ angular.module('ngCombobox', [])
 
         // Open/close the options when the open button is clicked
         $scope.toggleOptions = function(){
-          if ($options.is(':visible')) {
-            $options.hide();
+          if ($scope.showOptions) {
+            $scope.showOptions = false;
             $scope.focus = false;
           } else {
             var bottomEdge = $combobox.offset().top + $combobox.height() + $options.height();
@@ -165,7 +168,7 @@ angular.module('ngCombobox', [])
               $scope.flip = false;
             }
 
-            $options.show();
+            $scope.showOptions = true;
             $scope.focus = true;
           }
         };
@@ -177,8 +180,10 @@ angular.module('ngCombobox', [])
           var isInside = isChild || isSelf;
 
           if (!isInside) {
-            $scope.focus = false;
-            $options.hide();
+            $scope.$apply(function(){
+              $scope.focus = false;
+              $scope.showOptions = false;
+            });
           }
         };
 
