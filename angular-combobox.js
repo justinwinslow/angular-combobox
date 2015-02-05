@@ -2,7 +2,7 @@
 'use strict';
 
 var template = '<div class="combobox {{ addClass }} {{ params.addClass }}">' +
-  '<input type="text" ng-model="selected.text" ng-focus="focus" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}">' +
+  '<input type="text" ng-model="selected.text" ng-focus="focus" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}" ng-disabled="disabled">' +
   '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
   '<ul class="options" ng-if="showOptions && options.length" ng-class="{flip: flip}">' +
     '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
@@ -16,7 +16,8 @@ angular.module('ngCombobox', [])
       scope: {
         data: '=',
         params: '=',
-        model: '=ngModel'
+        model: '=ngModel',
+        disabled: '=ngDisabled'
       },
       link: function($scope, $element, $attrs, ctrl){
         var params = $.extend({}, $scope.params);
