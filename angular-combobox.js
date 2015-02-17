@@ -25,8 +25,6 @@ angular.module('ngCombobox', [])
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
 
-            console.log($combobox);
-
         $scope.addClass = $attrs.class;
 
         // Replace input with combobox
