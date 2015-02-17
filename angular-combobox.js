@@ -132,6 +132,9 @@ angular.module('ngCombobox', [])
         $scope.$watchCollection('data', function(newVal, oldVal){
           if (newVal != oldVal) {
             buildOptions();
+            // Reset selected if data changes to make sure we use the correct
+            // display text
+            setSelected($scope.selected.value);
           }
         });
 
