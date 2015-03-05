@@ -187,13 +187,13 @@ angular.module('ngCombobox', [])
         // parent elements when the options container is fully scrolled
         if ($.fn.mousewheel) {
           $combobox.delegate('.options', 'mousewheel', function (event) {
-            var top = $combobox.scrollTop();
             var $this = $(this);
+            var top = $this.scrollTop();
 
             if (event.deltaY > 0 && top - event.deltaY <= 0) {
               event.preventDefault();
               event.stopPropagation();
-            } else if (event.deltaY < 0 && $this.get(0).scrollHeight - $this.scrollTop() + event.deltaY <= $this.height()) {
+            } else if (event.deltaY < 0 && $this.get(0).scrollHeight - top + event.deltaY <= $this.height()) {
               event.preventDefault();
               event.stopPropagation();
             }
