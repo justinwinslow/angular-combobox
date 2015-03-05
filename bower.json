@@ -1,7 +1,7 @@
 {
   "name": "angular-combobox",
   "description": "ComboBox Directive for Angular",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "angular-combobox.js",
   "repository": {
     "type": "git",
