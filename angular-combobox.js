@@ -2,9 +2,9 @@
 'use strict';
 
 var template = '<div class="combobox {{ addClass }} {{ params.addClass }}">' +
-  '<input type="text" ng-model="selected.text" ng-focus="focus" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}" ng-disabled="disabled">' +
-  '<span class="open" ng-click="toggleOptions()" ng-class="{disabled: !options.length}">Open</span>' +
-  '<ul class="options" ng-if="showOptions && options.length" ng-class="{flip: flip}">' +
+  '<input type="text" ng-model="selected.text" ng-keyup="handleKeyup($event, selected.text)" placeholder="{{ placeholder }}" ng-disabled="disabled">' +
+  '<span class="open" ng-class="{disabled: !options.length}">Open</span>' +
+  '<ul class="options" ng-class="{flip: flip}">' +
     '<li class="option" ng-repeat="option in options" data-value="{{option.value}}" ng-click="selectOption(option)" ng-class="{hilighted: hilighted == $index}">{{option.text}}</li>' +
   '</ul>' +
 '</div>{{options.length}}';
@@ -24,6 +24,11 @@ angular.module('ngCombobox', [])
 
         // Compile the combobox template with our scope
         var $combobox = $compile(template)($scope);
+        var $input = $combobox.find('input');
+        var $options = $combobox.find('.options');
+        var $open = $combobox.find('.open');
+
+        $options.hide();
 
         $scope.addClass = $attrs.class;
 
@@ -33,8 +38,6 @@ angular.module('ngCombobox', [])
           setSelected($scope.model);
           $element.replaceWith($combobox);
         });
-
-        $scope.showOptions = false;
 
         $scope.options = [];
 
@@ -71,8 +74,8 @@ angular.module('ngCombobox', [])
 
         // UI method for updating the model on selection
         $scope.selectOption = function(option){
-          $scope.showOptions = false;
           $scope.model = option.value;
+          toggleOptions(false);
         };
 
         // Set the new selected option
@@ -97,11 +100,50 @@ angular.module('ngCombobox', [])
 
         $scope.hilighted = null;
 
+        var showOptions = function(){
+          if ($scope.options.length) {
+            // Focus on our input if the user opens the dropdown
+            $input.focus();
+
+            // Find the bottom edge of the options list
+            var bottomEdge = $combobox.offset().top + $combobox.height() + $options.height();
+
+            // If it's below the fold, let's flip it
+            if (bottomEdge + 24 > $(window).height()) {
+              $scope.flip = true;
+            } else {
+              $scope.flip = false;
+            }
+
+            $options.show();
+          }
+        };
+
+        var hideOptions = function(){
+          $options.hide();
+        };
+
+        var toggleOptions = function(show){
+          // If an argument is passed let's see what we should do
+          if (_.isBoolean(show)) {
+            if (show) {
+              showOptions();
+            } else {
+              hideOptions();
+            }
+          } else {
+            // otherwise, let's toggle based on current status
+            if ($options.is(':visible')) {
+              hideOptions();
+            } else {
+              showOptions();
+            }
+          }
+        };
+
         $scope.handleKeyup = function(event, text){
           // Show dropdown while typing
-          if (!$scope.showOptions) {
-            $scope.showOptions = true;
-          }
+          toggleOptions(true);
 
           if (event.keyCode == 40) {
             // Handle down arrow
@@ -122,12 +164,6 @@ angular.module('ngCombobox', [])
           }
         };
 
-        // Open/close the options when the open button is clicked
-        $scope.toggleOptions = function(){
-          $scope.showOptions = !$scope.showOptions;
-          $scope.focus = true;
-        };
-
         // Listen for the data to change and update options
         $scope.$watchCollection('data', function(newVal, oldVal){
           if (newVal != oldVal) {
@@ -145,20 +181,6 @@ angular.module('ngCombobox', [])
           }
         });
 
-        // Watch for show options to change and check whether options needs to be flipped
-        $scope.$watch('showOptions', function(val){
-          if (val) {
-            var $options = $combobox.find('.options');
-            var bottomEdge = $combobox.offset().top + $combobox.height() + $options.height();
-
-            if (bottomEdge + 24 > $(window).height()) {
-              $scope.flip = true;
-            } else {
-              $scope.flip = false;
-            }
-          }
-        });
-
         // Listen for the model to change
         $scope.$watch('model', function(newVal, oldVal){
           // Update selected with new value if it's changed
@@ -168,20 +190,17 @@ angular.module('ngCombobox', [])
         });
 
         // Hide options when user clicks outside
-        var hideOptions = function(event){
+        $document.on('click', function(event){
           var isChild = $combobox.has(event.target).length > 0;
           var isSelf = $combobox[0] == event.target;
           var isInside = isChild || isSelf;
 
           if (!isInside) {
-            $scope.$apply(function(){
-              $scope.showOptions = false;
-              $scope.focus = false;
-            });
+            toggleOptions(false);
           }
-        };
+        });
 
-        $document.on('click', hideOptions);
+        $open.click(toggleOptions);
 
         // If the mousewheel plugin is available, let's prevent scrolling
         // parent elements when the options container is fully scrolled
@@ -203,6 +222,7 @@ angular.module('ngCombobox', [])
         // Clean up
         $scope.$on('$destroy', function(){
           $document.off('click', hideOptions);
+          $open.off();
         });
       }
     };
