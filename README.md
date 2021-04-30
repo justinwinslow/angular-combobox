@@ -9,7 +9,7 @@ Select and raw text entry combo input for angular.
 
 ```html
 
-<input type="text" ng-model="someModel" data="someArrayOfOptions" params="params">
+<input type="text" combobox ng-model="someModel" data="someArrayOfOptions" params="params">
 ```
 
 ### data
